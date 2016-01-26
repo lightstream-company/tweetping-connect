@@ -1,0 +1,27 @@
+{
+  "name": "tweetping-connect",
+  "version": "1.0.0",
+  "description": "Connect to tweetping realtime channel",
+  "main": "connect.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lightstream-company/tweetping-connect.git"
+  },
+  "keywords": [
+    "tweetping",
+    "realtime",
+    "socket"
+  ],
+  "author": "Franck Ernewein",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lightstream-company/tweetping-connect/issues"
+  },
+  "homepage": "https://github.com/lightstream-company/tweetping-connect#readme",
+  "dependencies": {
+    "engine.io-client": "^1.6.8"
+  }
+}
