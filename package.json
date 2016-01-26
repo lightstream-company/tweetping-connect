@@ -2,8 +2,10 @@
   "name": "tweetping-connect",
   "version": "1.0.1",
   "description": "Connect to tweetping realtime channel",
-  "main": "connect.js",
+  "main": "lib/connect.js",
   "scripts": {
+    "prepublish": "npm run compile",
+    "compile": "babel -d lib/ src/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,5 +25,9 @@
   "homepage": "https://github.com/lightstream-company/tweetping-connect#readme",
   "dependencies": {
     "engine.io-client": "^1.6.8"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.4.5",
+    "babel-preset-es2015": "^6.3.13"
   }
 }
