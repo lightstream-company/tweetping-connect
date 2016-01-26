@@ -12,7 +12,3 @@ connect(1193, (post) => {
 }, URL);
 ```
 
-## Requirement
-
-For now, this module is written in ES6. It need to be transpiled with babel.
-
