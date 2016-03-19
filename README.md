@@ -13,7 +13,12 @@ Number which represent the stream id you want to connect (ex: `1250`)
 
 ### onEvent
 
-call back function: what's happening when you receive a new event from tweetping server
+callback function: what's happening when you receive a new event from tweetping server.
+
+this callback as 2 parameters:
+
+* event type or service which emit this new event
+* data
 
 
 ### options
@@ -44,8 +49,9 @@ import connect from 'tweetping-connect';
 const options = {
  services: ['wall', 'cities' /*, ... */ ]
 };
-connect(1193, (post) => {
-  console.log(post);
+connect(1193, (service, data) => {
+  console.log('from service: ' + service);
+  console.log(data);
 }, options);
 ```
 
