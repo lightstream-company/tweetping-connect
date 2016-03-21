@@ -7,7 +7,7 @@ function defaultUrl() {
     const {location} = window.document;
     return 'wss://' + (location.hostname || location.host);
   } else {
-    throw new Error('no default url found, explicit url is required');
+    return 'wss://tweetping.net/';
   }
 }
 
