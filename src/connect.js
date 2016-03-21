@@ -27,7 +27,7 @@ export default function connect(streamId, onMessage, url = defaultUrl(), timer =
   });
 
   socket.once('close', () => {
-    if(onMessage){
+    if (onMessage) {
       socket.off('message', parse);
     }
     if (timer < 1000000) {
@@ -36,7 +36,7 @@ export default function connect(streamId, onMessage, url = defaultUrl(), timer =
     setTimeout(() => connect(streamId, onMessage, url, timer), timer);
   });
 
-  if(onMessage){
+  if (onMessage) {
     socket.on('message', parse);
   }
 }
