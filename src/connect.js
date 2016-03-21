@@ -5,8 +5,7 @@ const INITIAL_RETRY_TIMER = 100;
 function defaultUrl() {
   if (typeof window !== 'undefined') {
     const {location} = window.document;
-    const protocol = location.protocol.indexOf('https') ? 'wss' : 'ws';
-    return protocol + '://' + (location.hostname || location.host);
+    return 'wss://' + (location.hostname || location.host);
   } else {
     throw new Error('no default url found, explicit url is required');
   }
