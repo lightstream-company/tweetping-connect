@@ -1,12 +1,11 @@
 import engineio from 'engine.io-client';
-import Readble from 'stream';
 
 const INITIAL_RETRY_TIMER = 100;
-const STREAM_OPTIONS = {
-  objectMode: true
-};
 
-export default function connect(id, service, callback, server = 'tweetping.net', timer = INITIAL_RETRY_TIMER, stream = new Readble(STREAM_OPTIONS)) {
+export default function connect(id, service, callback, server = 'tweetping.net', timer = INITIAL_RETRY_TIMER) {
+
+
+  var timeout;
 
   const options = {
     stream: id,
@@ -21,23 +20,22 @@ export default function connect(id, service, callback, server = 'tweetping.net',
     const firstChar = dataString.charAt(0);
     const floatParsed = parseFloat(dataString);
     var data = dataString;
-    if(firstChar === '{' || firstChar == '['){
-      try{
+    if (firstChar === '{' || firstChar == '[') {
+      try {
         data = JSON.parse(dataString);
-      }catch(e){
+      } catch (e) {
         console.log(e);
       }
-    }else if(!isNaN(floatParsed) && floatParsed.toString() === dataString){
+    } else if (!isNaN(floatParsed) && floatParsed.toString() === dataString) {
       data = floatParsed;
     }
-    if(typeof callback === 'function'){
+    if (typeof callback === 'function') {
       callback(data);
     }
-    stream.push(data);
   }
 
   socket.once('open', () => {
-    timer = INITIAL_RETRY_TIMER;
+    timeout = INITIAL_RETRY_TIMER;
     socket.send(JSON.stringify(options));
   });
 
@@ -46,12 +44,14 @@ export default function connect(id, service, callback, server = 'tweetping.net',
     if (timer < 1000000) {
       timer = timer * 10;
     }
-    setTimeout(() => connect(id, service, callback, timer, stream), timer);
+    timeout = setTimeout(() => connect(id, service, callback, timer), timer);
   });
 
   socket.on('message', onReceiveData);
 
-  stream.once('end', () => socket.close());
-
-  return stream;
+  return function close(){
+    clearTimeout(timeout);
+    socket.close();
+  };
+  
 }
