@@ -19,7 +19,17 @@ export default function connect(id, service, callback, server = 'tweetping.net',
 
   function onReceiveData(dataString) {
     const firstChar = dataString.charAt(0);
-    const data = (firstChar === '{' || firstChar == '[') ? JSON.parse(dataString) : dataString;
+    const floatParsed = parseFloat(dataString);
+    var data = dataString;
+    if(firstChar === '{' || firstChar == '['){
+      try{
+        data = JSON.parse(dataString);
+      }catch(e){
+        console.log(e);
+      }
+    }else if(!isNaN(floatParsed) && floatParsed.toString() === dataString){
+      data = floatParsed;
+    }
     if(typeof callback === 'function'){
       callback(data);
     }
