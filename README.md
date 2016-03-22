@@ -4,54 +4,55 @@ Connect to tweetping realtime channel
 ## Documentation
 
 ```
-connect(<Number> streamId, <Function> onEvent, <Object> options)
+connect(<String|Number> streamId, <String> service, <Function> callback, <String> hostname)
 ```
+
+return a stream (nodejs style)
 
 ### streamId
 
-Number which represent the stream id you want to connect (ex: `1250`)
+Number/String which represent the stream id you want to connect (ex: `1250`)
 
-### onEvent
-
-callback function: what's happening when you receive a new event from tweetping server.
-
-this callback as 2 parameters:
-
-* event type or service which emit this new event
-* data
-
-
-### options
-
-Javascript plain object.
-
-```js
-const options = {
-  sever: 'tweetping.net',
-  services: ['wall', 'cities']
-};
-```
-
-* server: server to connect. default: `tweetping.net`
-* services: array of services you want to be receive notification in real-time. default `['raw']`
+### service
 
 list of services:
 
 * [wall](https://github.com/lightstream-company/wall-projection)
 * ...
 
+### callback
+
+Execute it each time you'll receive a new event from tweetping server.
+
+### hostname
+
+Server to connect - default: `tweetping.net`
 
 ## Example
+
+### Callback style
 
 ```js
 import connect from 'tweetping-connect';
 
-const options = {
- services: ['wall', 'cities' /*, ... */ ]
-};
-connect(1193, (service, data) => {
-  console.log('from service: ' + service);
+connect(1193, 'wall', (data) => {
   console.log(data);
-}, options);
+});
 ```
 
+### Nodejs Stream Style
+
+```js
+import connect from 'tweetping-connect';
+
+const stream = connect(1193, 'wall');
+
+stream.on('data', message => console.log(message));
+//or 
+stream.pipe(process.stdout);
+
+stream.on('error', err => console.log('disconnected :(' );
+
+setTimeout(() => stream.end(), 10000); //close connection after 10s
+
+```

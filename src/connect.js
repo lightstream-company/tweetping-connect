@@ -1,41 +1,47 @@
 import engineio from 'engine.io-client';
+import Readble from 'stream';
 
 const INITIAL_RETRY_TIMER = 100;
+const STREAM_OPTIONS = {
+  objectMode: true
+};
 
-function defaultUrl() {
-  if (typeof window !== 'undefined') {
-    const {location} = window.document;
-    return 'wss://' + (location.hostname || location.host);
-  } else {
-    return 'wss://tweetping.net/';
-  }
-}
+export default function connect(id, service, callback, server = 'tweetping.net', timer = INITIAL_RETRY_TIMER, stream = new Readble(STREAM_OPTIONS)) {
 
-export default function connect(streamId, onMessage, url = defaultUrl(), timer = INITIAL_RETRY_TIMER) {
-  const socket = engineio.Socket(url, {
+  const options = {
+    stream: id,
+    service: service
+  };
+  const socket = engineio.Socket(server, {
     transports: ['websocket', 'polling']
   });
 
-  function parse(json) {
-    onMessage(JSON.parse(json));
+
+  function onReceiveData(dataString) {
+    const firstChar = dataString.charAt(0);
+    const data = (firstChar === '{' || firstChar == '[') ? JSON.parse(dataString) : dataString;
+    if(typeof callback === 'function'){
+      callback(data);
+    }
+    stream.push(data);
   }
 
   socket.once('open', () => {
     timer = INITIAL_RETRY_TIMER;
-    socket.send(streamId);
+    socket.send(JSON.stringify(options));
   });
 
   socket.once('close', () => {
-    if (onMessage) {
-      socket.off('message', parse);
-    }
+    socket.off('message', onReceiveData);
     if (timer < 1000000) {
       timer = timer * 10;
     }
-    setTimeout(() => connect(streamId, onMessage, url, timer), timer);
+    setTimeout(() => connect(id, service, callback, timer, stream), timer);
   });
 
-  if (onMessage) {
-    socket.on('message', parse);
-  }
+  socket.on('message', onReceiveData);
+
+  stream.once('end', () => socket.close());
+
+  return stream;
 }
