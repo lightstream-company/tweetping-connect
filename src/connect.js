@@ -2,41 +2,56 @@ import engineio from 'engine.io-client';
 
 const INITIAL_RETRY_TIMER = 100;
 
-function defaultUrl() {
-  if (typeof window !== 'undefined') {
-    const {location} = window.document;
-    const protocol = location.protocol.indexOf('https') ? 'wss' : 'ws';
-    return protocol + '://' + (location.hostname || location.host);
-  } else {
-    throw new Error('no default url found, explicit url is required');
-  }
-}
+export default function connect(id, service, callback, server = 'tweetping.net', timer = INITIAL_RETRY_TIMER) {
 
-export default function connect(streamId, onMessage, url = defaultUrl(), timer = INITIAL_RETRY_TIMER) {
-  const socket = engineio.Socket(url, {
+
+  var timeout;
+
+  const options = {
+    stream: id,
+    service: service
+  };
+  const socket = engineio.Socket(server, {
     transports: ['websocket', 'polling']
   });
 
-  function parse(json) {
-    onMessage(JSON.parse(json));
+
+  function onReceiveData(dataString) {
+    const firstChar = dataString.charAt(0);
+    const floatParsed = parseFloat(dataString);
+    var data = dataString;
+    if (firstChar === '{' || firstChar == '[') {
+      try {
+        data = JSON.parse(dataString);
+      } catch (e) {
+        console.log(e);
+      }
+    } else if (!isNaN(floatParsed) && floatParsed.toString() === dataString) {
+      data = floatParsed;
+    }
+    if (typeof callback === 'function') {
+      callback(data);
+    }
   }
 
   socket.once('open', () => {
-    timer = INITIAL_RETRY_TIMER;
-    socket.send(streamId);
+    timeout = INITIAL_RETRY_TIMER;
+    socket.send(JSON.stringify(options));
   });
 
   socket.once('close', () => {
-    if(onMessage){
-      socket.off('message', parse);
-    }
+    socket.off('message', onReceiveData);
     if (timer < 1000000) {
       timer = timer * 10;
     }
-    setTimeout(() => connect(streamId, onMessage, url, timer), timer);
+    timeout = setTimeout(() => connect(id, service, callback, timer), timer);
   });
 
-  if(onMessage){
-    socket.on('message', parse);
-  }
+  socket.on('message', onReceiveData);
+
+  return function close(){
+    clearTimeout(timeout);
+    socket.close();
+  };
+  
 }
