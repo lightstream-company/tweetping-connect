@@ -1,6 +1,6 @@
 {
   "name": "tweetping-connect",
-  "version": "2.0.0-beta",
+  "version": "2.0.0",
   "description": "Connect to tweetping realtime channel",
   "main": "lib/connect.js",
   "scripts": {
