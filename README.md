@@ -1,45 +1,24 @@
 # tweetping-connect
 Connect to tweetping realtime channel
 
-## Documentation
-
-```
-connect(<String|Number> streamId, <String> service, <Function> callback, <String> hostname)
-```
-
-return a function to close socket
-
-### streamId
-
-Number/String which represent the stream id you want to connect (ex: `1250`)
-
-### service
-
-list of services:
-
-* [wall](https://github.com/lightstream-company/wall-projection)
-* ...
-
-### callback
-
-Execute it each time you'll receive a new event from tweetping server.
-
-### hostname
-
-Server to connect - default: `tweetping.net`
-
-## Example
-
+## Usage
 
 ```js
-import connect from 'tweetping-connect';
+import createConnection from 'tweetping-connect';
 
-const close = connect(1193, 'wall', (data) => {
-  console.log(data);
-});
+//setup a connection to stream "n3rd"
+const {connect, load, permalink} = createConnection('n3rd');
 
+//load wall history
+load('wall').then(posts => console.log(posts));
 
-//close connection 20s later
-setTimeout(close, 20000);
+//receive new posts in realtime
+const close = connect('wall', data => console.log(data)});
+
+//return permalink for the post with the _id "1337"
+console.log(permalink(1337));
+
+//close connection 1 min later
+setTimeout(close, 60 * 1000);
 ```
 
