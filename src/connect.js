@@ -94,8 +94,15 @@ export default function createConnection(id, opt = {}) {
     }, options, opt)));
   }
 
+  function permalink(postId) {
+    return format(Object.assign({
+      pathname: join('redirect/stream', id.toString(), postId.toString())
+    }, options));
+  }
+
   return {
     connect,
-    load
+    load,
+    permalink
   };
 }
