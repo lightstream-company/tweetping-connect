@@ -94,6 +94,12 @@ export default function createConnection(id, opt = {}) {
     }, options, opt)));
   }
 
+  function info(opt = {}) {
+    return fetchJSON(format(Object.assign({
+      pathname: join('api/stream', id.toString())
+    }, options, opt)));
+  }
+
   function permalink(postId) {
     return format(Object.assign({
       pathname: join('redirect/stream', id.toString(), postId.toString())
@@ -103,6 +109,7 @@ export default function createConnection(id, opt = {}) {
   return {
     connect,
     load,
+    info,
     permalink
   };
 }

@@ -1,1 +1,5 @@
 src/
+test/
+.eslintrc
+.npmignore
+.gitignore.idea
